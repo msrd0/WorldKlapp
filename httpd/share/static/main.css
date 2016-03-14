@@ -1,0 +1,43 @@
+body {
+    background-color: #81d742;
+    margin: 0 auto;
+}
+
+#container {
+    /*background-color: #252525;*/
+}
+
+#title {
+    padding: 20px;
+    background-color: #252525;
+    margin-bottom: 30px;
+}
+#title img {
+    height: 150px;
+}
+#title table {
+    margin-left: auto;
+    margin-right: auto;
+}
+#title td {
+    color: #dd9933;
+}
+#title h1 {
+    font-size: 2.5em;
+}
+#title h2 {
+    font-size: 2em;
+}
+#title h1, #title h2 {
+    margin: 0;
+    text-align: center;
+}
+@media screen and (max-width: 900px) {
+    #title table {
+        margin-left: 30px;
+        margin-right: 30px;
+    }
+    #title img {
+        height: 100px;
+    }
+}

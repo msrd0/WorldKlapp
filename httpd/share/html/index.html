@@ -1,0 +1,38 @@
+<table border=0 rules="rows" cellspacing=0 cellpadding=5 width="100%">
+    <colgroup>
+        <col width="30px">
+        <col width="64px">
+        <col>
+        <col>
+        <col width="50px">
+        <col width="50px">
+    </colgroup>
+    <tr>
+        <th>Rang</th>
+        <th colspan=2>Team</th>
+        <th>Fahrer</th>
+        <th colspan=2>Runden</th>
+    </tr>
+    {for team}
+    <tr>
+        <td rowspan=4 align="right" valign="center">{team.rank}</td>
+        <td rowspan=4 align="right" valign="center"><img src="{prefix}img/team{team.id}.png"></td>
+        <td rowspan=4 align="left" valign="center">{team.name}</td>
+        <td align="left" valign="center">{team.driver0.name}</td>
+        <td align="right" valign="center">{team.driver0.laps}</td>
+        <td rowspan=4 align="right" valign="center">{team.laps}</td>
+    </tr>
+    <tr>
+        <td align="left" valign="center">{team.driver1.name}</td>
+        <td align="right" valign="center">{team.driver1.laps}</td>
+    </tr>
+    <tr>
+        <td align="left" valign="center">{team.driver2.name}</td>
+        <td align="right" valign="center">{team.driver2.laps}</td>
+    </tr>
+    <tr>
+        <td align="left" valign="center">{team.driver3.name}</td>
+        <td align="right" valign="center">{team.driver3.laps}</td>
+    </tr>
+    {end team}
+</table> 
