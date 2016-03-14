@@ -1,4 +1,5 @@
 .idea
+build/
 
 # ---> C++
 # Compiled Object files
