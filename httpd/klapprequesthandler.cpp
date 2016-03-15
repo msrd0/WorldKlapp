@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QHash>
 
 #include <mysql++/connection.h>
 #include <mysql++/query.h>
@@ -34,6 +35,14 @@ KlappRequestHandler::~KlappRequestHandler ()
 	delete statik;
 }
 
+struct Team
+{
+  int id;
+  QString name;
+  QString drivers[4];
+  int driverCount = 0;
+};
+
 void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 {
 	QByteArray path = request.getPath();
@@ -55,7 +64,8 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 		statik->service(request, response);
 		return;
 	}
-	
+
+	response.setHeader("Content-Type", "text/html; charset=utf-8");
 	Template base = html->getTemplate("base");
 	Q_ASSERT(!base.isEmpty());
 	Template t = html->getTemplate(path);
@@ -69,8 +79,25 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	StoreQueryResult r = q.store();
 	if (r)
 	  {
-	    t.loop("team", r.num_rows());
-	    printf("competitors table contains %d rows\n", r.num_rows());
+	    QHash<QString, Team> teams;
+	    for (int i = 0; i < r.num_rows(); i++)
+	      {
+		Team &t = teams[r[i]["Team-Name"].c_str()];;
+		t.id = QString(r[i]["Team-Nr"].c_str()).toInt();
+		t.name = r[i]["Team-Name"].c_str();
+		t.drivers[t.driverCount] = r[i]["Fahrer-Name"].c_str();
+		t.driverCount++;
+	      }
+	    t.loop("team", teams.size());
+	    int i = 0;
+	    for (Team &team : teams.values())
+	      {
+		t.setVariable("team" + QString::number(i) + ".rank", QString::number(team.id));
+		t.setVariable("team" + QString::number(i) + ".name", team.name);
+		for (int j = 0; j < 4; j++)
+		  t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".name", team.drivers[j]);
+		i++;
+	      }
 	  }
 	else
 	  {
