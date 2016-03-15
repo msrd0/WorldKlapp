@@ -5,6 +5,8 @@
 #include <staticfilecontroller.h>
 #include <templatecache.h>
 
+#include <mysql++/connection.h>
+
 class KlappRequestHandler : public HttpRequestHandler
 {
 public:
@@ -14,6 +16,7 @@ public:
 	virtual void service(HttpRequest &request, HttpResponse &response);
 	
 private:
+	mysqlpp::Connection *conn;
 	TemplateCache *html;
 	StaticFileController *statik;
 };

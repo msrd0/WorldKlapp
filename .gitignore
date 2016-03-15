@@ -1,5 +1,9 @@
 .idea
 build/
+klapp-competitors
+klapp-httpd
+*_automoc.cpp
+moc_*.cpp
 
 # ---> C++
 # Compiled Object files

@@ -47,5 +47,6 @@ add_executable(klapp-httpd
         httpd/main.cpp httpd/klapprequesthandler.h httpd/klapprequesthandler.cpp)
 target_link_libraries(klapp-httpd
         QtWebApp
+	${MYSQL_LIBRARIES}
         ${BOOST_LIBRARIES})
 
