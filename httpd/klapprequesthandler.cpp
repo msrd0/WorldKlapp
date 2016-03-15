@@ -3,17 +3,15 @@
 #include <QDebug>
 #include <QDir>
 #include <QHash>
-
-#include <mysql++/connection.h>
-#include <mysql++/query.h>
-using namespace mysqlpp;
+#include <QSqlError>
+#include <QSqlQuery>
 
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)
 #define PREFIX TO_STRING(USE_HTTP_PREFIX)
 
 KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QString &sharedPath)
-  : conn(false)
+		: db(QSqlDatabase::addDatabase("QMYSQL"))
 {
 	QSettings *settings = new QSettings(configFile, QSettings::IniFormat);
 	QSettings *s = new QSettings(settings);
@@ -27,7 +25,11 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 	s->setValue("path", QDir::current().absoluteFilePath(sharedPath));
 	s->setValue("encoding", "UTF-8");
 	statik = new StaticFileController(s);
-	conn.connect(settings->value("db/name").toByteArray().data(), settings->value("db/host").toByteArray().data(), settings->value("db/user").toByteArray().data(), settings->value("db/password").toByteArray().data());
+	db.setHostName(settings->value("db/host").toString());
+	db.setUserName(settings->value("db/user").toString());
+	db.setPassword(settings->value("db/password").toString());
+	db.setDatabaseName(settings->value("db/name").toString());
+	db.open();
 }
 
 KlappRequestHandler::~KlappRequestHandler ()
@@ -38,10 +40,10 @@ KlappRequestHandler::~KlappRequestHandler ()
 
 struct Team
 {
-  int id;
-  QString name;
-  QString drivers[4];
-  int driverCount = 0;
+	int id;
+	QString name;
+	QString drivers[4];
+	int driverCount = 0;
 };
 
 void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
@@ -55,17 +57,29 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	}
 	if (!path.startsWith(PREFIX))
 	{
-	  path = path.mid(1);
+		path = path.mid(1);
 	}
 	else
-	  path = path.mid(QByteArray(PREFIX).size());
+		path = path.mid(QByteArray(PREFIX).size());
 	
 	if (path.startsWith("static/"))
 	{
 		statik->service(request, response);
 		return;
 	}
-
+	if (path.startsWith("img/team/"))
+	{
+		QByteArray qq = QByteArray("SELECT __team_img FROM competitors WHERE `Team-Nr`=") + path.mid(9);
+		QSqlQuery q(db);
+		printf("%s\n", qq.data());
+		if (q.exec(qq) && q.first())
+		{
+			response.setHeader("Content-Type", "image/png");
+			response.write(q.value("__team_img").toByteArray(), true);
+			return;
+		}
+	}
+	
 	response.setHeader("Content-Type", "text/html; charset=utf-8");
 	Template base = html->getTemplate("base");
 	Q_ASSERT(!base.isEmpty());
@@ -75,37 +89,40 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	else if (t.isEmpty())
 		t = html->getTemplate("404");
 	Q_ASSERT(!t.isEmpty());
-
-	if (path=="index"){
-	Query q = conn.query("SELECT * FROM competitors;");
-	StoreQueryResult r = q.store();
-	if (r)
-	  {
-	    QHash<QString, Team> teams;
-	    for (int i = 0; i < r.num_rows(); i++)
-	      {
-		Team &t = teams[r[i]["Team-Name"].c_str()];;
-		t.id = QString(r[i]["Team-Nr"].c_str()).toInt();
-		t.name = r[i]["Team-Name"].c_str();
-		t.drivers[t.driverCount] = r[i]["Fahrer-Name"].c_str();
-		t.driverCount++;
-	      }
-	    t.loop("team", teams.size());
-	    int i = 0;
-	    for (Team &team : teams.values())
-	      {
-		t.setVariable("team" + QString::number(i) + ".rank", QString::number(team.id));
-		t.setVariable("team" + QString::number(i) + ".name", team.name);
-		for (int j = 0; j < 4; j++)
-		  t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".name", team.drivers[j]);
-		i++;
-	      }
-	  }
-	else
-	  {
-	    t.loop("team", 0);
-	    printf("Error while querying competitors table\n");
-	  }
+	
+	if (path == "index")
+	{
+		QSqlQuery q(db);
+		if (q.exec("SELECT * FROM competitors;") && q.first())
+		{
+			QHash<QString, Team> teams;
+			do
+			{
+				Team &t = teams[q.value("Team-Name").toString()];
+				t.id = q.value("Team-Nr").toInt();
+				t.name = q.value("Team-Name").toString();
+				t.drivers[t.driverCount] = q.value("Fahrer-Name").toString();
+				t.driverCount++;
+			}
+			while (q.next());
+			
+			t.loop("team", teams.size());
+			int i = 0;
+			for (Team &team : teams.values())
+			{
+				t.setVariable("team" + QString::number(i) + ".id", QString::number(team.id));
+				t.setVariable("team" + QString::number(i) + ".rank", QString::number(team.id));
+				t.setVariable("team" + QString::number(i) + ".name", team.name);
+				for (int j = 0; j < 4; j++)
+					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".name", team.drivers[j]);
+				i++;
+			}
+		}
+		else
+		{
+			t.loop("team", 0);
+			printf("Error while querying competitors table (%s)\n", qPrintable(q.lastError().text()));
+		}
 	}
 	
 	base.setVariable("body", t);

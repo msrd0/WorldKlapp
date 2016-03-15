@@ -1,11 +1,11 @@
 #ifndef WORLDKLAPP_KLAPPREQUESTHANDLER_H
 #define WORLDKLAPP_KLAPPREQUESTHANDLER_H
 
+#include <QSqlDatabase>
+
 #include <httprequesthandler.h>
 #include <staticfilecontroller.h>
 #include <templatecache.h>
-
-#include <mysql++/connection.h>
 
 class KlappRequestHandler : public HttpRequestHandler
 {
@@ -16,7 +16,7 @@ public:
 	virtual void service(HttpRequest &request, HttpResponse &response);
 	
 private:
-	mysqlpp::Connection conn;
+	QSqlDatabase db;
 	TemplateCache *html;
 	StaticFileController *statik;
 };
