@@ -16,7 +16,7 @@ public:
 	virtual void service(HttpRequest &request, HttpResponse &response);
 	
 private:
-	mysqlpp::Connection *conn;
+	mysqlpp::Connection conn;
 	TemplateCache *html;
 	StaticFileController *statik;
 };

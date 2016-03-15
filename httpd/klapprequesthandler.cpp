@@ -13,6 +13,7 @@ using namespace mysqlpp;
 #define PREFIX TO_STRING(USE_HTTP_PREFIX)
 
 KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QString &sharedPath)
+  : conn(false)
 {
 	QSettings *settings = new QSettings(configFile, QSettings::IniFormat);
 	QSettings *s = new QSettings(settings);
@@ -26,7 +27,7 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 	s->setValue("path", QDir::current().absoluteFilePath(sharedPath));
 	s->setValue("encoding", "UTF-8");
 	statik = new StaticFileController(s);
-	conn = new Connection(settings->value("db/name").toByteArray().data(), settings->value("db/host").toByteArray().data(), settings->value("db/user").toByteArray().data(), settings->value("db/password").toByteArray().data());
+	conn.connect(settings->value("db/name").toByteArray().data(), settings->value("db/host").toByteArray().data(), settings->value("db/user").toByteArray().data(), settings->value("db/password").toByteArray().data());
 }
 
 KlappRequestHandler::~KlappRequestHandler ()
@@ -75,7 +76,8 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 		t = html->getTemplate("404");
 	Q_ASSERT(!t.isEmpty());
 
-	Query q = conn->query("SELECT * FROM competitors;");
+	if (path=="index"){
+	Query q = conn.query("SELECT * FROM competitors;");
 	StoreQueryResult r = q.store();
 	if (r)
 	  {
@@ -104,6 +106,7 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	    t.loop("team", 0);
 	    printf("Error while querying competitors table\n");
 	  }
+	}
 	
 	base.setVariable("body", t);
 	base.setVariable("prefix", PREFIX);
