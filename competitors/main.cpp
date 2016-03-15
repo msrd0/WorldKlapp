@@ -9,6 +9,12 @@ using namespace mysqlpp;
 #include <boost/algorithm/string.hpp>
 using namespace boost;
 
+#include <QEventLoop>
+#include <QImage>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+
 int main (int argc, char **argv)
 {
 	if (argc != 6)
@@ -16,8 +22,11 @@ int main (int argc, char **argv)
 		cerr << "Usage: " << argv[0] << " <csv> <host> <user> <password> <database>" << endl;
 		return 1;
 	}
-	
-	Connection con(argv[5], argv[2], argv[3], argv[4]);
+
+	QNetworkAccessManager mgr;
+
+	Connection con(false);
+	con.connect(argv[5], argv[2], argv[3], argv[4]);
 	if (!con.connected())
 	{
 		cerr << "Failed to connect to the database!" << endl;
@@ -72,7 +81,18 @@ int main (int argc, char **argv)
 		if (!q.exec(query))
 		{
 			cerr << "Failed to insert competitor of line " << linenum << endl;
+			continue;
 		}
+
+		QNetworkRequest req(QString(s0[8].data()));
+		QEventLoop loop;
+		QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &loop, SLOT(quit()));
+		QNetworkReply *reply = mgr.get(req);
+		loop.exec();
+		QImage img;
+		img.loadFromData(reply->readAll());
+		img = img.scaled(64,64, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		img.save(QString("share/img/team") + s[2].data() + ".png", "PNG");
 	}
 	
 	return 0;

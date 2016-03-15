@@ -28,12 +28,18 @@ add_definitions(${Qt5Core_DEFINITIONS})
 find_package(Qt5Network REQUIRED)
 include_directories(${Qt5Network_INCLUDE_DIRS})
 add_definitions(${Qt5Network_DEFINITIONS})
+find_package(Qt5Gui REQUIRED)
+include_directories(${Qt5Gui_INCLUDE_DIRS})
+add_definitions(${Qt5Gui_DEFINITIONS})
 
 add_executable(klapp-competitors 
         competitors/main.cpp)
 target_link_libraries(klapp-competitors
         ${MYSQL_LIBRARIES}
-        ${BOOST_LIBRARIES})
+        ${BOOST_LIBRARIES}
+	Qt5::Core
+	Qt5::Network
+	Qt5::Gui)
 
 aux_source_directory(QtWebApp/httpserver QTWEBAPP_HTTPSERVER)
 aux_source_directory(QtWebApp/templateengine QTWEBAPP_TEMPLATEENGINE)
