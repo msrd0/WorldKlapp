@@ -34,16 +34,24 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 
 KlappRequestHandler::~KlappRequestHandler ()
 {
+	// wait for running requests
+	dbMutex.lock();
 	delete html;
 	delete statik;
 }
 
+struct Driver
+{
+	int id;
+	QString name;
+};
 struct Team
 {
 	int id;
 	QString name;
-	QString drivers[4];
+	Driver drivers[4];
 	int driverCount = 0;
+	int curr = 1;
 };
 
 void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
@@ -69,15 +77,33 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	}
 	if (path.startsWith("img/team/"))
 	{
-		QByteArray qq = QByteArray("SELECT __team_img FROM competitors WHERE `Team-Nr`=") + path.mid(9);
+		dbMutex.lock();
+		QByteArray qq = QByteArray("SELECT __team_img FROM competitors WHERE `Team-Nr`=") + path.mid(9) + ";";
 		QSqlQuery q(db);
 		printf("%s\n", qq.data());
 		if (q.exec(qq) && q.first())
 		{
+			dbMutex.unlock();
 			response.setHeader("Content-Type", "image/png");
 			response.write(q.value("__team_img").toByteArray(), true);
 			return;
 		}
+		dbMutex.unlock();
+	}
+	if (path.startsWith("img/driver/"))
+	{
+		dbMutex.lock();
+		QByteArray qq = QByteArray("SELECT __driver_img FROM competitors WHERE `Start-Nr`='") + path.mid(11) + "';";
+		QSqlQuery q(db);
+		printf("%s\n", qq.data());
+		if (q.exec(qq) && q.first())
+		{
+			dbMutex.unlock();
+			response.setHeader("Content-Type", "image/png");
+			response.write(q.value("__driver_img").toByteArray(), true);
+			return;
+		}
+		dbMutex.unlock();
 	}
 	
 	response.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -92,6 +118,7 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	
 	if (path == "index")
 	{
+		dbMutex.lock();
 		QSqlQuery q(db);
 		if (q.exec("SELECT * FROM competitors;") && q.first())
 		{
@@ -101,7 +128,7 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 				Team &t = teams[q.value("Team-Name").toString()];
 				t.id = q.value("Team-Nr").toInt();
 				t.name = q.value("Team-Name").toString();
-				t.drivers[t.driverCount] = q.value("Fahrer-Name").toString();
+				t.drivers[t.driverCount] = Driver{q.value("Fahrer-Nr").toInt(), q.value("Fahrer-Name").toString()};
 				t.driverCount++;
 			}
 			while (q.next());
@@ -113,8 +140,14 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 				t.setVariable("team" + QString::number(i) + ".id", QString::number(team.id));
 				t.setVariable("team" + QString::number(i) + ".rank", QString::number(team.id));
 				t.setVariable("team" + QString::number(i) + ".name", team.name);
-				for (int j = 0; j < 4; j++)
-					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".name", team.drivers[j]);
+				t.setVariable("team" + QString::number(i) + ".curr", QString::number(team.curr));
+				t.loop("team" + QString::number(i) + ".driver", team.driverCount);
+				for (int j = 0; j < team.driverCount; j++)
+				{
+					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".id", QString::number(team.drivers[j].id));
+					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".name", team.drivers[j].name);
+					t.setCondition("team" + QString::number(i) + ".driver" + QString::number(j) + ".curr", team.drivers[j].id == team.curr);
+				}
 				i++;
 			}
 		}
@@ -123,6 +156,7 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 			t.loop("team", 0);
 			printf("Error while querying competitors table (%s)\n", qPrintable(q.lastError().text()));
 		}
+		dbMutex.unlock();
 	}
 	
 	base.setVariable("body", t);

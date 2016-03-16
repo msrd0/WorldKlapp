@@ -1,38 +1,49 @@
 <table border=0 rules="rows" cellspacing=0 cellpadding=5 width="100%">
     <colgroup>
-        <col width="30px">
-        <col width="64px">
-        <col>
-        <col>
-        <col width="50px">
-        <col width="50px">
+        <col width="50px"> <!-- Platz -->
+        <col width="70px"> <!-- Team-Bild -->
+        <col width="50px"> <!-- Aktueller Fahrer (***) -->
+        <col>              <!-- Team/Fahrer-Name -->
+        <col width="50px"> <!-- Team/Fahrer-Nr -->
+        <col width="50px"> <!-- Durchschnittsgeschwindigkeit -->
+        <col width="50px"> <!-- Letzte Rundengeschwindigkeit -->
+        <col width="70px"> <!-- Aktueller Fahrer Bild -->
+        <col width="50px"> <!-- Rundenanzahl -->
+        <col width="80px"> <!-- Chip -->
     </colgroup>
     <tr>
         <th>Rang</th>
-        <th colspan=2>Team</th>
-        <th>Fahrer</th>
-        <th colspan=2>Runden</th>
+        <th colspan=4>Team / Fahrer</th>
+        <th colspan=2>Geschwindigkeit</th>
+        <th></th>
+        <th>Runden</th>
+        <th>Chip</th>
     </tr>
     {loop team}
     <tr>
-        <td rowspan=4 align="right" valign="center">{team.rank}</td>
-        <td rowspan=4 align="right" valign="center"><img src="{prefix}img/team/{team.id}"></td>
-        <td rowspan=4 align="left" valign="center">{team.name}</td>
-        <td align="left" valign="center">{team.driver0.name}</td>
-        <td align="right" valign="center">{team.driver0.laps}</td>
-        <td rowspan=4 align="right" valign="center">{team.laps}</td>
+        <td align="right" valign="center">{team.rank}</td>
+        <td align="center" valign="center"><img src="{prefix}img/team/{team.id}"></td>
+        <td></td>
+        <td align="left" valign="center">{team.name}</td>
+        <td align="left" valign="center">{team.id}</td>
+        <td align="right" valign="center">{team.avg}</td>
+        <td align="right" valign="center">{team.last}</td>
+        <td align="center" valign="center"><img src="{prefix}img/driver/{team.id}-{team.curr}"></td>
+        <td align="right" valign="center">{team.laps}</td>
+        <td></td>
     </tr>
+    {loop team.driver}
     <tr>
-        <td align="left" valign="center">{team.driver1.name}</td>
-        <td align="right" valign="center">{team.driver1.laps}</td>
+        <td colspan=2></td>
+        <td>{if team.driver.curr}***{end team.driver.curr}</td>
+        <td>{team.driver.name}</td>
+        <td>{team.driver.id}</td>
+        <td>{team.driver.avg}</td>
+        <td>{team.driver.last}</td>
+        <td></td>
+        <td>{team.driver.laps}</td>
+        <td>{team.driver.chip}</td>
     </tr>
-    <tr>
-        <td align="left" valign="center">{team.driver2.name}</td>
-        <td align="right" valign="center">{team.driver2.laps}</td>
-    </tr>
-    <tr>
-        <td align="left" valign="center">{team.driver3.name}</td>
-        <td align="right" valign="center">{team.driver3.laps}</td>
-    </tr>
+    {end team.driver}
     {end team}
 </table> 

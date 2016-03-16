@@ -13,6 +13,26 @@ using namespace std;
 #include <QSqlError>
 #include <QSqlQuery>
 
+QNetworkAccessManager mgr;
+inline QByteArray downloadImage (const QString &url, int size = 64)
+{
+	QNetworkRequest req(url);
+	printf("GET %s\n", req.url().toDisplayString(QUrl::FullyDecoded).toLocal8Bit().data());
+	QEventLoop loop;
+	QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &loop, SLOT(quit()));
+	QNetworkReply *reply = mgr.get(req);
+	loop.exec();
+	printf("GOT %s\n", req.url().toDisplayString(QUrl::FullyDecoded).toLocal8Bit().data());
+	QImage img;
+	img.loadFromData(reply->readAll());
+	img = img.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	QByteArray imgData;
+	QBuffer buf(&imgData);
+	buf.open(QIODevice::WriteOnly);
+	img.save(&buf, "PNG");
+	return imgData;
+}
+
 int main (int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
@@ -21,9 +41,7 @@ int main (int argc, char **argv)
 		cerr << "Usage: " << argv[0] << " <csv> <host> <user> <password> <database>" << endl;
 		return 1;
 	}
-
-	QNetworkAccessManager mgr;
-
+	
 	QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
 	db.setHostName(argv[2]);
 	db.setUserName(argv[3]);
@@ -55,7 +73,7 @@ int main (int argc, char **argv)
 	QString query = "CREATE TABLE competitors (uid BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY";
 	for (auto a : s)
 		query += ", `" + a + "` TEXT NOT NULL DEFAULT ''";
-	query += ", __team_img BLOB) DEFAULT CHARSET=utf8;";
+	query += ", __team_img BLOB, __driver_img BLOB) DEFAULT CHARSET=utf8;";
 	q = QSqlQuery(db);
 	if (!q.exec(query))
 	{
@@ -81,25 +99,11 @@ int main (int argc, char **argv)
 			query += ", '" + a + "'"; // TODO XSS
 		}
 		
-		QNetworkRequest req(QString(s0[8].data()));
-		printf("GET %s\n", req.url().toDisplayString(QUrl::FullyDecoded).toLocal8Bit().data());
-		QEventLoop loop;
-		QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &loop, SLOT(quit()));
-		QNetworkReply *reply = mgr.get(req);
-		loop.exec();
-		printf("GOT %s\n", req.url().toDisplayString(QUrl::FullyDecoded).toLocal8Bit().data());
-		QImage img;
-		img.loadFromData(reply->readAll());
-		img = img.scaled(64,64, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		QByteArray imgData;
-		QBuffer buf(&imgData);
-		buf.open(QIODevice::WriteOnly);
-		img.save(&buf, "PNG");
-		query += ", x'" + imgData.toHex().toUpper() + "');";
+		query += ", x'" + downloadImage(s0[8]).toHex().toUpper() + "', x'" + downloadImage(s0[9]).toHex().toUpper() + "');";
 		
 		if (!q.exec(query))
 		{
-			cerr << "Failed to insert competitor of line " << linenum << endl;
+			cerr << "Failed to insert competitor of line " << linenum << ": " << q.lastError().text().toStdString() << endl;
 			continue;
 		}
 

@@ -1,6 +1,7 @@
 #ifndef WORLDKLAPP_KLAPPREQUESTHANDLER_H
 #define WORLDKLAPP_KLAPPREQUESTHANDLER_H
 
+#include <QMutex>
 #include <QSqlDatabase>
 
 #include <httprequesthandler.h>
@@ -17,6 +18,7 @@ public:
 	
 private:
 	QSqlDatabase db;
+	QMutex dbMutex;
 	TemplateCache *html;
 	StaticFileController *statik;
 };
