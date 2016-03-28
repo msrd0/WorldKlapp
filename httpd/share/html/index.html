@@ -21,28 +21,28 @@
     </tr>
     {loop team}
     <tr>
-        <td align="right" valign="center">{team.rank}</td>
-        <td align="center" valign="center"><img src="{prefix}img/team/{team.id}"></td>
+        <td align="right">{team.rank}</td>
+        <td align="center"><img src="{prefix}img/team/{team.id}"></td>
         <td></td>
-        <td align="left" valign="center">{team.name}</td>
-        <td align="left" valign="center">{team.id}</td>
-        <td align="right" valign="center">{team.avg}</td>
-        <td align="right" valign="center">{team.last}</td>
-        <td align="center" valign="center"><img src="{prefix}img/driver/{team.id}-{team.curr}"></td>
-        <td align="right" valign="center">{team.laps}</td>
+        <td align="left">{team.name}</td>
+        <td align="left">{team.id}</td>
+        <td align="right">{team.avg} km/h</td>
+        <td align="right">{team.last} km/h</td>
+        <td align="center"><img src="{prefix}img/driver/{team.id}-{team.curr}"></td>
+        <td align="right">{team.laps}</td>
         <td></td>
     </tr>
     {loop team.driver}
     <tr>
         <td colspan=2></td>
-        <td>{if team.driver.curr}***{end team.driver.curr}</td>
-        <td>{team.driver.name}</td>
-        <td>{team.driver.id}</td>
-        <td>{team.driver.avg}</td>
-        <td>{team.driver.last}</td>
+        <td align="right">{if team.driver.curr}***{end team.driver.curr}</td>
+        <td align="left">{team.driver.name}</td>
+        <td align="left">{team.driver.id}</td>
+        <td align="right">{team.driver.avg} km/h</td>
+        <td align="right">{team.driver.last} km/h</td>
         <td></td>
-        <td>{team.driver.laps}</td>
-        <td>{team.driver.chip}</td>
+        <td align="right">{team.driver.laps}</td>
+        <td align="left">{team.driver.chip}</td>
     </tr>
     {end team.driver}
     {end team}

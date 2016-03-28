@@ -25,11 +25,17 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 	s->setValue("path", QDir::current().absoluteFilePath(sharedPath));
 	s->setValue("encoding", "UTF-8");
 	statik = new StaticFileController(s);
+	printf("Conneting to database %s at %s (%s:%s)\n",
+	       qPrintable(settings->value("db/name").toString()),
+	       qPrintable(settings->value("db/host").toString()),
+	       qPrintable(settings->value("db/user").toString()),
+	       qPrintable(settings->value("db/password").toString()));
 	db.setHostName(settings->value("db/host").toString());
 	db.setUserName(settings->value("db/user").toString());
 	db.setPassword(settings->value("db/password").toString());
 	db.setDatabaseName(settings->value("db/name").toString());
-	db.open();
+	if (!db.open())
+	  fprintf(stderr, "Failed to connect to database: %s\n", qPrintable(db.lastError().text()));
 }
 
 KlappRequestHandler::~KlappRequestHandler ()
@@ -44,6 +50,12 @@ struct Driver
 {
 	int id;
 	QString name;
+  QString chip = "AB-1234";
+  int laps = 100;
+  int avg = 10, last = 9;
+
+  Driver() : id(-1), name("") {}
+  Driver(int id, const QString &name) : id(id), name(name) {}
 };
 struct Team
 {
@@ -52,13 +64,15 @@ struct Team
 	Driver drivers[4];
 	int driverCount = 0;
 	int curr = 1;
+  int laps = 400;
+  int avg = 10, last = 9;
 };
 
 void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 {
 	QByteArray path = request.getPath();
 	printf("%s %s %s (%s)\n", request.getIP().data(), request.getMethod().data(), path.data(), request.getHeader("User-Agent").data());
-	if (path == PREFIX)
+	if (path == PREFIX || path == "/")
 	{
 		response.redirect(PREFIX "index");
 		return;
@@ -141,11 +155,18 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 				t.setVariable("team" + QString::number(i) + ".rank", QString::number(team.id));
 				t.setVariable("team" + QString::number(i) + ".name", team.name);
 				t.setVariable("team" + QString::number(i) + ".curr", QString::number(team.curr));
+				t.setVariable("team" + QString::number(i) + ".laps", QString::number(team.laps));
+				t.setVariable("team" + QString::number(i) + ".avg", QString::number(team.avg));
+				t.setVariable("team" + QString::number(i) + ".last", QString::number(team.last));
 				t.loop("team" + QString::number(i) + ".driver", team.driverCount);
 				for (int j = 0; j < team.driverCount; j++)
 				{
 					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".id", QString::number(team.drivers[j].id));
 					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".name", team.drivers[j].name);
+					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".laps", QString::number(team.drivers[j].laps));
+					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".avg", QString::number(team.drivers[j].avg));
+					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".last", QString::number(team.drivers[j].last));
+					t.setVariable("team" + QString::number(i) + ".driver" + QString::number(j) + ".chip", team.drivers[j].chip);
 					t.setCondition("team" + QString::number(i) + ".driver" + QString::number(j) + ".curr", team.drivers[j].id == team.curr);
 				}
 				i++;
