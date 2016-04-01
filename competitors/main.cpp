@@ -13,6 +13,8 @@ using namespace std;
 #include <QSqlError>
 #include <QSqlQuery>
 
+#define e(x) ((x).replace("'", "''"))
+
 QNetworkAccessManager mgr;
 inline QByteArray downloadImage (const QString &url, int size = 64)
 {
@@ -53,11 +55,71 @@ int main (int argc, char **argv)
 		return 1;
 	}
 	
-	// clean content of the competitors table
+	// maybe create competitors table
 	QSqlQuery q(db);
-	if (!q.exec("DROP TABLE IF EXISTS competitors;"))
+	if (!q.exec("CREATE TABLE IF NOT EXISTS `competitors` (\n"
+			            "  `uid` int(11) NOT NULL AUTO_INCREMENT,\n"
+			            "  `Lastname` varchar(50) NOT NULL,\n"
+			            "  `Firstname` varchar(50) NOT NULL,\n"
+			            "  `Address1` varchar(50) NOT NULL,\n"
+			            "  `Address2` varchar(50) NOT NULL,\n"
+			            "  `ZipCode` int(11) NOT NULL DEFAULT '0',\n"
+			            "  `Town` tinytext,\n"
+			            "  `State` tinytext,\n"
+			            "  `Country` text,\n"
+			            "  `Phone` tinytext,\n"
+			            "  `Sex` varchar(2) DEFAULT NULL,\n"
+			            "  `Number` tinytext,\n"
+			            "  `License` tinytext,\n"
+			            "  `Licensetype` tinytext,\n"
+			            "  `BirthYear` int(11) NOT NULL DEFAULT '0',\n"
+			            "  `Category` tinytext,\n"
+			            "  `CategoryName` text,\n"
+			            "  `CategoryAbbrev` tinytext,\n"
+			            "  `Nation` text,\n"
+			            "  `Team` text,\n"
+			            "  `TeamCode` tinytext,\n"
+			            "  `Competition` text,\n"
+			            "  `CompetitionType` text,\n"
+			            "  `CompetitionTown` text,\n"
+			            "  `CompetitionZipCode` text,\n"
+			            "  `CompetitionDate` text,\n"
+			            "  `Race` text,\n"
+			            "  `Distance` text,\n"
+			            "  `Time` tinytext,\n"
+			            "  `RunnerSeconds` tinytext,\n"
+			            "  `RoundedTime` tinytext,\n"
+			            "  `RoundedSeconds` tinytext,\n"
+			            "  `RoundedHours` tinytext,\n"
+			            "  `Ranking` tinytext,\n"
+			            "  `CategoryRanking` tinytext,\n"
+			            "  `Organization` tinytext,\n"
+			            "  `Paid` text,\n"
+			            "  `Invited` tinytext,\n"
+			            "  `MedProvided` varchar(3) NOT NULL,\n"
+			            "  `MarkedStarted` tinytext,\n"
+			            "  `Stopped` tinytext,\n"
+			            "  `Disqualified` tinytext,\n"
+			            "  `Qualified` tinytext,\n"
+			            "  `SendResults` tinytext,\n"
+			            "  `Handicap` tinytext,\n"
+			            "  `RunnerID` int(11) NOT NULL DEFAULT '0',\n"
+			            "  `Sponsor` tinytext,\n"
+			            "  `Awards` tinytext,\n"
+			            "  `EMail` varchar(128) NOT NULL,\n"
+			            "  `U4ProChipID` varchar(10) NOT NULL,\n"
+			            "  PRIMARY KEY (`uid`)\n"
+			            ") ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;"))
 	{
-		cerr << "Failed to delete the existing table!" << endl;
+		fprintf(stderr, "Failed to create the 'competitors' table (%s).\n", qPrintable(q.lastError().text()));
+		return 1;
+	}
+	
+	// clean content of the competitors table
+	q = QSqlQuery(db);
+	if (!q.exec("DELETE FROM competitors;"))
+	{
+		cerr << "Failed to clean the existing table!" << endl;
 		return 1;
 	}
 	
@@ -70,37 +132,23 @@ int main (int argc, char **argv)
 	}
 	QByteArray line = in.readLine().trimmed();
 	QList<QByteArray> s = line.split(',');
-	QString query = "CREATE TABLE competitors (uid BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY";
-	for (auto a : s)
-		query += ", `" + a + "` TEXT NOT NULL DEFAULT ''";
-	query += ", __team_img BLOB, __driver_img BLOB) DEFAULT CHARSET=utf8;";
-	q = QSqlQuery(db);
-	if (!q.exec(query))
-	{
-		fprintf(stderr, "Failed to create table (%s)\n", qPrintable(q.lastError().text()));
-		return 1;
-	}
-	uint uid = 0;
 	for (uint linenum = 2; !in.atEnd(); linenum++)
 	{
 		line = in.readLine().trimmed();
 		if (line == "")
 			continue;
+		// Start-Nr,Fahrer-Kurzname,Team-Nr ,Team-Kurzname,Team-Name,Fahrer-Nr,Fahrer-Name,Team_id,Team-URL,Fahrer-URL,ProChip
+		// 0       ,1              ,2       ,3            ,4        ,5        ,6          ,7      ,8       ,9         ,10
+		// Number  ,Lastname       ,TeamCode,             ,Team     ,Address1 ,Firstname  ,       ,        ,          ,U4ProChipID
 		QList<QByteArray> s0 = line.split(',');
 		if (s0.size() != s.size())
 		{
 			cerr << "Error in line " << linenum << ": Column count differs from title!" << endl;
 			continue;
 		}
-		query = "INSERT INTO competitors VALUES (" + QString::number(++uid);
-		for (auto a : s0)
-		{
-			a.replace('\'', "''");
-			query += ", '" + a + "'"; // TODO XSS
-		}
-		
-		query += ", x'" + downloadImage(s0[8]).toHex().toUpper() + "', x'" + downloadImage(s0[9]).toHex().toUpper() + "');";
-		
+		QByteArray query = "INSERT INTO competitors (Lastname, Firstname, Address1, Address2, Number, Team, TeamCode, MedProvided, EMail, U4ProChipID) VALUES ("
+				"'" + e(s0[1]) + "', '" + e(s0[6]) + "', '" + e(s0[5]) + "', 'Cares', '" + e(s0[0]) + "', '" + e(s0[4]) + "', '" + e(s0[2]) + "'"
+				", '?', 'who@cares', '" + e(s0[10]) + "');";
 		if (!q.exec(query))
 		{
 			cerr << "Failed to insert competitor of line " << linenum << ": " << q.lastError().text().toStdString() << endl;
