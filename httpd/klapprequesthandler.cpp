@@ -139,10 +139,10 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 			QHash<QString, Team> teams;
 			do
 			{
-				Team &t = teams[q.value("Team-Name").toString()];
-				t.id = q.value("Team-Nr").toInt();
-				t.name = q.value("Team-Name").toString();
-				t.drivers[t.driverCount] = Driver{q.value("Fahrer-Nr").toInt(), q.value("Fahrer-Name").toString()};
+				Team &t = teams[q.value("Team").toString()];
+				t.id = q.value("TeamCode").toInt();
+				t.name = q.value("Team").toString();
+				t.drivers[t.driverCount] = Driver{q.value("Address1").toInt(), q.value("Firstname").toString()};
 				t.driverCount++;
 			}
 			while (q.next());
