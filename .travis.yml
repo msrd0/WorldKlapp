@@ -1,0 +1,33 @@
+language: c++
+compiler:
+  - gcc
+  - clang
+
+env:
+  global:
+    secure: mjPtIQ53KNrMhuuqN+y9Go+TqIineA2xE54ZMfjb5k2NGMuv+NZoV7aFAsXBnrcdOfQDhfF9c3WOT/YtlnNtn5sOQR1Pr2LyVjoG8t6Hr+ONU4LGzB4cIdsJu3gvh0tAXN6ePIWJs9kf5KAwe+B7BPlZRfn3f0fDSijq7NXFO71/UDSn/lvnYyLw3HjGXvLGOjT9WEl4+Mf6gstQYvdLJVP65imxPtq5Kn0TyloUe64PUX9NyQqFwrTQdBWq60k1CaTLEHDM9jKXar8hw8sSemqIZKb2qmIjiFAULJV/PvqQLjv7AjPXzH3LicuN/cte7JFRd8A77u4KOleYZc1IPUseVqm+/g/p1v4a4cZ5sAQQrLpDonw1q98E1uxy+BbPoFSU2Gn34ZSK7zxP7oppK5SadeFUAipragqb0nHIEMyUJmX8I1BZpqGmZY7Ul/PiWPc/w2ottdBCP2ZTAsq71rsm9JX37VewNd+duC+704hplQIlsITv/odCmHMF74xKTqCRgPPv4Yo8d9kSMKo9zCYcE3dHUsnsrHN7f/PPPgosFiWIVG/FX2JCmZlqdn7Lxmhy6//KSWxxXSBOjBAc70MlJMS1PGJfom+okMUWHhGRP+YUdyHoO+XNub/mQo7RfKgNur7MBte6lCvKGc7kFHM/qloDrxZwE5TnxwoBKXI=
+
+sudo: required
+dist: trusty
+addons:
+  apt:
+    packages:
+      - qt5-default
+      - yui-compressor
+
+install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y npm
+  - sudo npm install -g svgo
+
+before_script:
+  - git config --global user.email "msrd0@users.noreply.github.com"
+  - git config --global user.name "Dominic (via Travis)"
+  - git config --global push.default simple
+  - git config credential.helper "store --file=.git/credentials"
+  - echo "https://${GH_TOKEN}:@github.com" >.git/credentials
+
+script:
+  - ./.travis-minify.sh
+  - cmake .
+  - make -j2
