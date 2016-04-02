@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-git checkout travis
+git checkout master
 if [ "${CC: -3}" == "gcc" ]; then
     for file in httpd/share/static/*.{js,css}; do
 	if [[ $file != *.min.* ]]; then
