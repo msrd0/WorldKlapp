@@ -50,22 +50,24 @@ struct Driver
 {
 	int id;
 	QString name;
-  QString chip = "AB-1234";
-  int laps = 100;
-  int avg = 10, last = 9;
+    QString chip = "AB-1234";
+    int laps = 100;
+    int avg = 10, last = 9;
 
-  Driver() : id(-1), name("") {}
-  Driver(int id, const QString &name) : id(id), name(name) {}
+    Driver() : id(-1), name("") {}
+    Driver(int id, const QString &name) : id(id), name(name) {}
 };
 struct Team
 {
-	int id;
+	int id, rank;
 	QString name;
 	Driver drivers[4];
 	int driverCount = 0;
 	int curr = 1;
-  int laps = 400;
-  int avg = 10, last = 9;
+    int laps = 400;
+    int avg = 10, last = 9;
+	
+	bool operator< (const Team &other) const { return (rank < other.rank); }
 };
 
 void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
@@ -89,36 +91,6 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 		statik->service(request, response);
 		return;
 	}
-	if (path.startsWith("img/team/"))
-	{
-		dbMutex.lock();
-		QByteArray qq = QByteArray("SELECT __team_img FROM competitors WHERE `Team-Nr`=") + path.mid(9) + ";";
-		QSqlQuery q(db);
-		printf("%s\n", qq.data());
-		if (q.exec(qq) && q.first())
-		{
-			dbMutex.unlock();
-			response.setHeader("Content-Type", "image/png");
-			response.write(q.value("__team_img").toByteArray(), true);
-			return;
-		}
-		dbMutex.unlock();
-	}
-	if (path.startsWith("img/driver/"))
-	{
-		dbMutex.lock();
-		QByteArray qq = QByteArray("SELECT __driver_img FROM competitors WHERE `Start-Nr`='") + path.mid(11) + "';";
-		QSqlQuery q(db);
-		printf("%s\n", qq.data());
-		if (q.exec(qq) && q.first())
-		{
-			dbMutex.unlock();
-			response.setHeader("Content-Type", "image/png");
-			response.write(q.value("__driver_img").toByteArray(), true);
-			return;
-		}
-		dbMutex.unlock();
-	}
 	
 	response.setHeader("Content-Type", "text/html; charset=utf-8");
 	Template base = html->getTemplate("base");
@@ -141,18 +113,21 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 			{
 				Team &t = teams[q.value("Team").toString()];
 				t.id = q.value("TeamCode").toInt();
+				t.rank = t.id;
 				t.name = q.value("Team").toString();
 				t.drivers[t.driverCount] = Driver{q.value("Address1").toInt(), q.value("Firstname").toString()};
 				t.driverCount++;
 			}
 			while (q.next());
 			
+			auto teamlist = teams.values();
+			std::sort(teamlist.begin(), teamlist.end());
 			t.loop("team", teams.size());
 			int i = 0;
-			for (Team &team : teams.values())
+			for (Team &team : teamlist)
 			{
 				t.setVariable("team" + QString::number(i) + ".id", QString::number(team.id));
-				t.setVariable("team" + QString::number(i) + ".rank", QString::number(team.id));
+				t.setVariable("team" + QString::number(i) + ".rank", QString::number(team.rank));
 				t.setVariable("team" + QString::number(i) + ".name", team.name);
 				t.setVariable("team" + QString::number(i) + ".curr", QString::number(team.curr));
 				t.setVariable("team" + QString::number(i) + ".laps", QString::number(team.laps));

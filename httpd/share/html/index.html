@@ -1,49 +1,46 @@
-<table border=0 rules="rows" cellspacing=0 cellpadding=5 width="100%">
+<table border=0 rules="rows" cellspacing=0 cellpadding=5 width="100%" class="sticky">
     <colgroup>
         <col width="50px"> <!-- Platz -->
-        <col width="70px"> <!-- Team-Bild -->
-        <col width="50px"> <!-- Aktueller Fahrer (***) -->
         <col>              <!-- Team/Fahrer-Name -->
-        <col width="50px"> <!-- Team/Fahrer-Nr -->
-        <col width="80px"> <!-- Durchschnittsgeschwindigkeit -->
-        <col width="80px"> <!-- Letzte Rundengeschwindigkeit -->
-        <col width="70px"> <!-- Aktueller Fahrer Bild -->
-        <col width="50px"> <!-- Rundenanzahl -->
-        <col width="80px"> <!-- Chip -->
+        <col width="50px"> <!-- Aktueller Fahrer (***) -->
+        <col width="70px"> <!-- Rundenanzahl -->
+        <col width="120px"> <!-- Durchschnittsgeschwindigkeit -->
+        <col width="120px"> <!-- Letzte Rundengeschwindigkeit -->
+        <col width="120px"> <!-- Team/Fahrer-Nr -->
     </colgroup>
-    <tr>
-        <th>Rang</th>
-        <th colspan=4>Team / Fahrer</th>
-        <th colspan=2>Geschwindigkeit</th>
-        <th></th>
-        <th>Runden</th>
-        <th>Chip</th>
-    </tr>
-    {loop team}
-    <tr>
-        <td align="right">{team.rank}</td>
-        <td align="center"><img src="{prefix}img/team/{team.id}"></td>
-        <td></td>
-        <td align="left">{team.name}</td>
-        <td align="left">{team.id}</td>
-        <td align="right">{team.avg} km/h</td>
-        <td align="right">{team.last} km/h</td>
-        <td align="center"><img src="{prefix}img/driver/{team.id}-{team.curr}"></td>
-        <td align="right">{team.laps}</td>
-        <td></td>
-    </tr>
-    {loop team.driver}
-    <tr>
-        <td colspan=2></td>
-        <td align="right">{if team.driver.curr}***{end team.driver.curr}</td>
-        <td align="left">{team.driver.name}</td>
-        <td align="left">{team.driver.id}</td>
-        <td align="right">{team.driver.avg} km/h</td>
-        <td align="right">{team.driver.last} km/h</td>
-        <td></td>
-        <td align="right">{team.driver.laps}</td>
-        <td align="left">{team.driver.chip}</td>
-    </tr>
-    {end team.driver}
-    {end team}
+    <thead>
+        <tr>
+            <th>Platz</th>
+            <th colspan>Team / Fahrer</th>
+            <th>aktiv</th>
+            <th>Runden</th>
+            <th>Durchschnitt</th>
+            <th>Letzte&nbsp;Runde</th>
+            <th>Startnummer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {loop team}
+        <tr bgcolor="#e5e8e8">
+            <td align="right">{team.rank}</td>
+            <td align="left">{team.name}</td>
+            <td></td>
+            <td align="center">{team.laps}</td>
+            <td align="right">{team.avg} km/h</td>
+            <td align="right">{team.last} km/h</td>
+            <td align="center">{team.id}</td>
+        </tr>
+        {loop team.driver}
+        <tr>
+            <td></td>
+            <td align="right">{team.driver.name}</td>
+            <td align="center">{if team.driver.curr}***{end team.driver.curr}</td>
+            <td align="right">{team.driver.laps}</td>
+            <td align="right">{team.driver.avg} km/h</td>
+            <td align="right">{team.driver.last} km/h</td>
+            <td align="center">{team.id}-{team.driver.id}</td>
+        </tr>
+        {end team.driver}
+        {end team}
+    </tbody>
 </table> 
