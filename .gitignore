@@ -77,3 +77,6 @@ tramp
 # cask packages
 .cask/
 
+# ---> QtCreator
+*.user
+build-*/
