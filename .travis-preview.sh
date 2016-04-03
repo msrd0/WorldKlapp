@@ -11,7 +11,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 	pid=$!
 	sleep 10 # wait for the server to start
 	cd ..
-	wget -O .travis-preview.html http://localhost:8080/
+	wget -O .travis-preview.html http://localhost:$DBPORT/
 	kill -9 $pid
 	
 	test -r .git/refs/heads/preview && git checkout preview || git checkout --orphan preview

@@ -17,6 +17,7 @@ dist: trusty
 addons:
   apt:
     packages:
+      - mysql-client
       - qt5-default
       - yui-compressor
 
