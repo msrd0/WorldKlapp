@@ -36,8 +36,10 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 	db.setUserName(settings->value("db/user").toString());
 	db.setPassword(settings->value("db/password").toString());
 	db.setDatabaseName(settings->value("db/name").toString());
-	if (!db.open())
-	  fprintf(stderr, "Failed to connect to database: %s\n", qPrintable(db.lastError().text()));
+	if (db.open())
+		printf("Connected to database\n");
+	else
+	    fprintf(stderr, "Failed to connect to database: %s\n", qPrintable(db.lastError().text()));
 
 #ifdef CMAKE_DISABLE_DEBUG
 	printf("WARN: will redirect static requests to their minified sources\n");

@@ -17,7 +17,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 	test -r .git/refs/heads/preview && git checkout preview || git checkout --orphan preview
 	git pull origin preview || echo "failed to pull"
 	cp .travis-preview.html index.html
-	sed -i 's/\/msrd0\/WorldKlapp\/master\/httpd\/share\/https:\/\/raw.githubusercontent.com\/msrd0\/WorldKlapp\/master\/httpd\/share\//'
+	sed -i 's/\/msrd0\/WorldKlapp\/master\/httpd\/share\//https:\/\/raw.githubusercontent.com\/msrd0\/WorldKlapp\/master\/httpd\/share\//'
 	git add index.html
 	git commit index.html -m "update preview" && git push origin preview || echo "failed to push"
 fi
