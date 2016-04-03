@@ -1,3 +1,10 @@
+<div id="timeDiv">
+    <div>
+        <div>Aktuelle Zeit: {currtime}</div>
+        <div>Verbleibende Zeit: {remtime}</div>
+    </div>
+</div>
+
 <div id="searchDiv">
     <div>
         Teams durchsuchen:
@@ -15,6 +22,7 @@
         <col width="70px"> <!-- Rundenanzahl -->
         <col width="120px"> <!-- Durchschnittsgeschwindigkeit -->
         <col width="120px"> <!-- Letzte Rundengeschwindigkeit -->
+        <col width="120px"> <!-- Geschwindigkeit zum Aufholen -->
         <col width="120px"> <!-- Team/Fahrer-Nr -->
     </colgroup>
     <thead>
@@ -25,6 +33,7 @@
             <th>Runden</th>
             <th>Durchschnitt</th>
             <th>Letzte&nbsp;Runde</th>
+            <th>Aufholen</th>
             <th>Startnummer</th>
         </tr>
     </thead>
@@ -35,8 +44,9 @@
             <td align="left" class="name">{team.name}</td>
             <td></td>
             <td align="center">{team.laps}</td>
-            <td align="right">{team.avg} km/h</td>
-            <td align="right">{team.last} km/h</td>
+            <td align="right">{team.avg}&nbsp;km/h</td>
+            <td align="right">{team.last}&nbsp;km/h</td>
+            <td align="right">{team.catchup}&nbsp;km/h</td>
             <td align="center">{team.id}</td>
         </tr>
         {loop team.driver}
@@ -45,8 +55,9 @@
             <td align="right">{team.driver.name}</td>
             <td align="center">{if team.driver.curr}***{end team.driver.curr}</td>
             <td align="right">{team.driver.laps}</td>
-            <td align="right">{team.driver.avg} km/h</td>
-            <td align="right">{team.driver.last} km/h</td>
+            <td align="right">{team.driver.avg}&nbsp;km/h</td>
+            <td align="right">{team.driver.last}&nbsp;km/h</td>
+            <td></td>
             <td align="center">{team.id}-{team.driver.id}</td>
         </tr>
         {end team.driver}

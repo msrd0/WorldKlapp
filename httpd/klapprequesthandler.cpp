@@ -1,5 +1,6 @@
 #include "klapprequesthandler.h"
 
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QHash>
@@ -55,7 +56,7 @@ struct Driver
 	int id;
 	QString name;
     QString chip = "AB-1234";
-    int laps = 100;
+    int laps = 200;
     int avg = 10, last = 9;
 
     Driver() : id(-1), name("") {}
@@ -68,11 +69,13 @@ struct Team
 	Driver drivers[4];
 	int driverCount = 0;
 	int curr = 1;
-    int laps = 400;
+    int laps = 800;
     int avg = 10, last = 9;
 	
 	bool operator< (const Team &other) const { return (rank < other.rank); }
 };
+
+QDateTime end = QDateTime::currentDateTime().addSecs(360);
 
 void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 {
@@ -123,6 +126,9 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	
 	if (path == "index")
 	{
+		t.setVariable("currtime", QDateTime::currentDateTime().time().toString());
+		qint64 rem = end.toMSecsSinceEpoch() - QDateTime::currentMSecsSinceEpoch();
+		t.setVariable("remtime", QDateTime::fromMSecsSinceEpoch(rem).time().toString());
 		dbMutex.lock();
 		QSqlQuery q(db);
 		if (q.exec("SELECT * FROM competitors;") && q.first())
@@ -132,6 +138,7 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 			{
 				Team &t = teams[q.value("Team").toString()];
 				t.id = q.value("TeamCode").toInt();
+				t.laps -= t.id*t.id*t.id;
 				t.rank = t.id;
 				t.name = q.value("Team").toString();
 				t.drivers[t.driverCount] = Driver{q.value("Address1").toInt(), q.value("Firstname").toString()};
@@ -152,6 +159,12 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 				t.setVariable("team" + QString::number(i) + ".laps", QString::number(team.laps));
 				t.setVariable("team" + QString::number(i) + ".avg", QString::number(team.avg));
 				t.setVariable("team" + QString::number(i) + ".last", QString::number(team.last));
+				if (i == 0)
+					t.setVariable("team" + QString::number(i) + ".catchup", "-");
+				else
+					t.setVariable("team" + QString::number(i) + ".catchup", QString::number(
+							(0.45*teamlist[i-1].laps + teamlist[i-1].avg*rem/360.0 - 0.45*team.laps)/rem*360.0,
+							'f', 2));
 				t.loop("team" + QString::number(i) + ".driver", team.driverCount);
 				for (int j = 0; j < team.driverCount; j++)
 				{
