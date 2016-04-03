@@ -1,5 +1,12 @@
 #!/bin/bash
 
+waitForServer() {
+	for i in {0..20}; do
+		nc -z "$DBHOST" "$DBPORT" && return 0
+	done
+	return 1
+}
+
 if [ "${CC: -3}" == "gcc" ]; then
 	cd httpd
 	sed -i 's/name=.*$/name='"$DBNAME"'/'             httpd.ini
@@ -9,7 +16,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 	sed -i 's/password=.*$/password='"$DBPASSWORD"'/' httpd.ini
 	LD_LIBRARY_PATH=.. ../klapp-httpd &
 	pid=$!
-	sleep 60 # wait for the server to start
+	waitForServer() || exit 0 # wait for the server to start
 	cd ..
 	wget -O .travis-preview.html http://localhost:$DBPORT/
 	kill -9 $pid
