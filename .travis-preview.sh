@@ -9,7 +9,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 	sed -i 's/password=.*$/password='"$DBPASSWORD"'/' httpd.ini
 	LD_LIBRARY_PATH=.. ../klapp-httpd &
 	pid=$!
-	sleep 10 # wait for the server to start
+	sleep 60 # wait for the server to start
 	cd ..
 	wget -O .travis-preview.html http://localhost:$DBPORT/
 	kill -9 $pid
