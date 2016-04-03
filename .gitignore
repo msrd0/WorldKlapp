@@ -1,3 +1,7 @@
+# TRAVIS KEYS - don't even think about adding them
+travis
+travis.pub
+
 .idea
 build/
 klapp-competitors

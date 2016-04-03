@@ -34,6 +34,11 @@ before_script:
   - git config --global push.default simple
   - git config credential.helper "store --file=.git/credentials"
   - echo "https://${GH_TOKEN}:@github.com" >.git/credentials
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - openssl aes-256-cbc -K $encrypted_99c0f2780e68_key -iv $encrypted_99c0f2780e68_iv -in .travis.enc -out ~/.ssh/travis -d
+  - openssl aes-256-cbc -K $encrypted_99c0f2780e68_key -iv $encrypted_99c0f2780e68_iv -in .travis.pub.enc -out ~/.ssh/travis.pub -d
+  - chmod 600 ~/.ssh/travis{,.pub}
 
 script:
   - "./.travis-minify.sh"

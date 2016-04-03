@@ -1,8 +1,10 @@
 #!/bin/bash
 
+HTTPPORT=8080
+
 waitForServer() {
 	for i in {0..20}; do
-		nc -z "$DBHOST" "$DBPORT" && return 0
+		nc -z -w5 localhost $HTTPPORT && return 0
 	done
 	return 1
 }
@@ -11,9 +13,10 @@ if [ "${CC: -3}" == "gcc" ]; then
 	cd httpd
 	sed -i 's/name=.*$/name='"$DBNAME"'/'             httpd.ini
 	sed -i 's/user=.*$/user='"$DBUSER"'/'             httpd.ini
-	sed -i 's/host=.*$/host='"$DBHOST"'/'             httpd.ini
-	sed -i 's/port=.*$/port='"$DBPORT"'/'             httpd.ini
+	sed -i 's/host=.*$/host='"localhost"'/'           httpd.ini
+	#sed -i 's/port=.*$/port='"$DBPORT"'/'             httpd.ini # keep 3306
 	sed -i 's/password=.*$/password='"$DBPASSWORD"'/' httpd.ini
+	ssh -L 3306:127.0.0.1:3306 travis@$DBHOST
 	LD_LIBRARY_PATH=.. ../klapp-httpd &
 	pid=$!
 	waitForServer || exit 0 # wait for the server to start
