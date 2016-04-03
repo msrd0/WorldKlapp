@@ -26,11 +26,10 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 	s->setValue("path", QDir::current().absoluteFilePath(sharedPath));
 	s->setValue("encoding", "UTF-8");
 	statik = new StaticFileController(s);
-	printf("Conneting to database %s at %s (%s:%s)\n",
+	printf("Conneting to database %s at %s (%s)\n",
 	       qPrintable(settings->value("db/name").toString()),
 	       qPrintable(settings->value("db/host").toString()),
-	       qPrintable(settings->value("db/user").toString()),
-	       qPrintable(settings->value("db/password").toString()));
+	       qPrintable(settings->value("db/user").toString()));
 	db.setHostName(settings->value("db/host").toString());
 	db.setUserName(settings->value("db/user").toString());
 	db.setPassword(settings->value("db/password").toString());
@@ -41,6 +40,7 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 #ifdef CMAKE_DISABLE_DEBUG
 	printf("WARN: will redirect static requests to their minified sources\n");
 #endif
+	printf("RequestHandler registered on 0.0.0.0:%d%s", settings->value("port").toInt(), PREFIX);
 }
 
 KlappRequestHandler::~KlappRequestHandler ()

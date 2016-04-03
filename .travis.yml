@@ -29,5 +29,6 @@ before_script:
 
 script:
   - ./.travis-minify.sh
-  - cmake .
+  - cmake -DUSE_HTTP_PREFIX=/msrd0/WorldKlapp/master/httpd/share/ .
   - make -j2
+  - ./.travis-preview.sh
