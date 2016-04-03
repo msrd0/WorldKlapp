@@ -1,3 +1,12 @@
+<div id="searchDiv">
+    <div>
+        Teams durchsuchen:
+        <input type="text" id="search" placeholder="Suchbegriff eingeben">
+        <!--<button id="searchButton">Suchen</button>-->
+    </div>
+</div>
+<script src="{prefix}static/search.js"></script>
+
 <table border=0 rules="rows" cellspacing=0 cellpadding=5 width="100%" class="sticky">
     <colgroup>
         <col width="50px"> <!-- Platz -->
@@ -21,9 +30,9 @@
     </thead>
     <tbody>
         {loop team}
-        <tr bgcolor="#e5e8e8">
+        <tr class="team" id="team{team.id}">
             <td align="right">{team.rank}</td>
-            <td align="left">{team.name}</td>
+            <td align="left" class="name">{team.name}</td>
             <td></td>
             <td align="center">{team.laps}</td>
             <td align="right">{team.avg} km/h</td>
@@ -31,7 +40,7 @@
             <td align="center">{team.id}</td>
         </tr>
         {loop team.driver}
-        <tr>
+        <tr class="driver team{team.id}" id="team{team.id}driver{team.driver.id}">
             <td></td>
             <td align="right">{team.driver.name}</td>
             <td align="center">{if team.driver.curr}***{end team.driver.curr}</td>

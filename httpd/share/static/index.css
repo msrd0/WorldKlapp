@@ -1,0 +1,12 @@
+#searchDiv {
+    /*float: right;*/
+    margin: 20px;
+    display: inline;
+}
+#searchDiv div {
+    padding: 0 10px;
+}
+
+tr.team {
+    background-color: #e5e8e8;
+}

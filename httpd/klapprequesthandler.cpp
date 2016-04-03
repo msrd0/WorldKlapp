@@ -36,6 +36,10 @@ KlappRequestHandler::KlappRequestHandler (const QString &configFile, const QStri
 	db.setDatabaseName(settings->value("db/name").toString());
 	if (!db.open())
 	  fprintf(stderr, "Failed to connect to database: %s\n", qPrintable(db.lastError().text()));
+
+#ifdef CMAKE_DISABLE_DEBUG
+	printf("WARN: will redirect static requests to their minified sources\n");
+#endif
 }
 
 KlappRequestHandler::~KlappRequestHandler ()
@@ -88,6 +92,14 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	
 	if (path.startsWith("static/"))
 	{
+#ifdef CMAKE_DISABLE_DEBUG
+		if (!path.contains(".min."))
+		{
+			int in = path.lastIndexOf('.');
+			response.redirect(PREFIX + path.mid(0,in) + ".min" + path.mid(in));
+			return;
+		}
+#endif
 		statik->service(request, response);
 		return;
 	}
@@ -97,10 +109,17 @@ void KlappRequestHandler::service (HttpRequest &request, HttpResponse &response)
 	Q_ASSERT(!base.isEmpty());
 	Template t = html->getTemplate(path);
 	if (path == "base")
+	{
+		response.setStatus(403);
 		t = html->getTemplate("403");
+	}
 	else if (t.isEmpty())
+	{
+		response.setStatus(404);
 		t = html->getTemplate("404");
+	}
 	Q_ASSERT(!t.isEmpty());
+	base.setVariable("name", path);
 	
 	if (path == "index")
 	{
