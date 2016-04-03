@@ -28,6 +28,5 @@ if [ "${CC: -3}" == "gcc" ]; then
 			git add "$target"
 		fi
 	done
-	git commit -m "[skip ci] update minified css & js & svg"
-	git push
+	git commit -m "[skip ci] update minified css & js & svg" && git push || true
 fi
