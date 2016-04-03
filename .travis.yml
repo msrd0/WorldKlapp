@@ -19,6 +19,7 @@ addons:
     packages:
       - libqt5sql5-mysql
       - mysql-client
+      - netcat-openbsd
       - qt5-default
       - yui-compressor
 
