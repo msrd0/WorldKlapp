@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-git checkout master
+git checkout "${TRAVIS_BRANCH:master}"
 if [ "${CC: -3}" == "gcc" ]; then
 	for file in html/*.{js,css}; do
 		if [[ $file != *.min.* ]]; then
@@ -37,3 +37,4 @@ if [ "${CC: -3}" == "gcc" ]; then
 	done
 	git commit -m "[skip ci] update minified css & js & svg" && git push || true
 fi
+git checkout "${TRAVIS_COMMIT:master}" || true
