@@ -12,6 +12,7 @@ dist: trusty
 addons:
   apt:
     packages:
+      - libmicrohttpd-dev
       - libqt5sql5-mysql
       - mysql-client
       - netcat-openbsd
