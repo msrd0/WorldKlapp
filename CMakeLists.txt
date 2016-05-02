@@ -33,4 +33,4 @@ target_link_libraries(QtWebApp
         Qt5::Core
         Qt5::Network)
 
-
+add_subdirectory(api)
