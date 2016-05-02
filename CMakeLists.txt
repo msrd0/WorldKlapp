@@ -25,22 +25,6 @@ find_package(Qt5Network REQUIRED)
 include_directories(${Qt5Network_INCLUDE_DIRS})
 add_definitions(${Qt5Network_DEFINITIONS})
 
-find_package(Qt5Gui REQUIRED)
-include_directories(${Qt5Gui_INCLUDE_DIRS})
-add_definitions(${Qt5Gui_DEFINITIONS})
-
-find_package(Qt5Sql REQUIRED)
-include_directories(${Qt5Sql_INCLUDE_DIRS})
-add_definitions(${Qt5Sql_DEFINITIONS})
-
-add_executable(klapp-competitors
-        competitors/main.cpp)
-target_link_libraries(klapp-competitors
-        Qt5::Core
-        Qt5::Network
-        Qt5::Gui
-        Qt5::Sql)
-
 aux_source_directory(QtWebApp/httpserver QTWEBAPP_HTTPSERVER)
 aux_source_directory(QtWebApp/templateengine QTWEBAPP_TEMPLATEENGINE)
 include_directories(QtWebApp/httpserver QtWebApp/templateengine)
@@ -49,9 +33,4 @@ target_link_libraries(QtWebApp
         Qt5::Core
         Qt5::Network)
 
-add_executable(klapp-httpd
-        httpd/main.cpp httpd/klapprequesthandler.h httpd/klapprequesthandler.cpp)
-target_link_libraries(klapp-httpd
-        QtWebApp
-        Qt5::Sql)
 

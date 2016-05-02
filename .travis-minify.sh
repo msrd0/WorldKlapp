@@ -2,7 +2,7 @@
 
 git checkout master
 if [ "${CC: -3}" == "gcc" ]; then
-	for file in httpd/share/static/*.{js,css}; do
+	for file in html/*.{js,css}; do
 		if [[ $file != *.min.* ]]; then
 			target="${file%.*}.min.${file##*.}"
 			rm -f "$target" || true
@@ -15,7 +15,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 			git add "$target"
 		fi
 	done
-	for file in httpd/share/static/*.svg; do
+	for file in html/*.svg; do
 		if [[ $file != *.min.* ]]; then
 			target="${file%.*}.min.${file##*.}"
 			rm -f "$target" || true
@@ -27,6 +27,13 @@ if [ "${CC: -3}" == "gcc" ]; then
 			fi
 			git add "$target"
 		fi
+	done
+	for file in html/*.min.*; do
+	    target="${file%.min.*}.gz"
+	    rm -f "$target" || true
+	    echo "==> compressing $file to $target"
+	    cat "$file" | gzip >"$target"
+	    git add "$target"
 	done
 	git commit -m "[skip ci] update minified css & js & svg" && git push || true
 fi
