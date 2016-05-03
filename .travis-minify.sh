@@ -33,7 +33,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 			target="${file%.*}.min.${file##*.}"
 			rm -rf "$target" || true
 			echo "==> minifying $file to $target"
-			html-minifier --html-5 --remove-comments --collapse-whitespaces "$file" >"$target"
+			html-minifier --html-5 --remove-comments --collapse-whitespace "$file" >"$target"
 			if [ "$(du "$target" | awk '{print $1}')" == 0 ]; then
 				echo " -> fail"
 				cp "$file" "$target"
