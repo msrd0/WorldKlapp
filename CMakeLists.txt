@@ -21,16 +21,4 @@ find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 add_definitions(${Qt5Core_DEFINITIONS})
 
-find_package(Qt5Network REQUIRED)
-include_directories(${Qt5Network_INCLUDE_DIRS})
-add_definitions(${Qt5Network_DEFINITIONS})
-
-aux_source_directory(QtWebApp/httpserver QTWEBAPP_HTTPSERVER)
-aux_source_directory(QtWebApp/templateengine QTWEBAPP_TEMPLATEENGINE)
-include_directories(QtWebApp/httpserver QtWebApp/templateengine)
-add_library(QtWebApp SHARED ${QTWEBAPP_HTTPSERVER} ${QTWEBAPP_TEMPLATEENGINE})
-target_link_libraries(QtWebApp
-        Qt5::Core
-        Qt5::Network)
-
 add_subdirectory(api)
