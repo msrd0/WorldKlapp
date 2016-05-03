@@ -28,6 +28,18 @@ if [ "${CC: -3}" == "gcc" ]; then
 			git add "$target"
 		fi
 	done
+	for file in html/klapp/*.html; do
+	    if [[ $file != *.min.* ]]; then
+		target="${file%.*}.min.${file##*.}"
+		rm -rf "$target" || true
+		echo "==> minifying $file to $target"
+		html-minifier --html-5 --remove-comments --collapse-whitespaces "$file" >"$target"
+		if [ "$(du "$target" | awk '{print $1}')" == 0 ]; then
+                    echo " -> fail"
+                    cp "$file" "$target"
+                fi
+		git add "$target"
+	done
 	for file in html/klapp/*.min.*; do
 	    target="${file%.min.*}.${file#*.min.}.gz"
 	    rm -f "$target" || true
