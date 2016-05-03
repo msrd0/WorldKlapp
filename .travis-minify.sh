@@ -2,7 +2,7 @@
 
 git checkout "${TRAVIS_BRANCH:master}"
 if [ "${CC: -3}" == "gcc" ]; then
-	for file in html/*.{js,css}; do
+	for file in html/klapp/*.{js,css}; do
 		if [[ $file != *.min.* ]]; then
 			target="${file%.*}.min.${file##*.}"
 			rm -f "$target" || true
@@ -15,7 +15,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 			git add "$target"
 		fi
 	done
-	for file in html/*.svg; do
+	for file in html/klapp/*.svg; do
 		if [[ $file != *.min.* ]]; then
 			target="${file%.*}.min.${file##*.}"
 			rm -f "$target" || true
@@ -28,7 +28,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 			git add "$target"
 		fi
 	done
-	for file in html/*.min.*; do
+	for file in html/klapp/*.min.*; do
 	    target="${file%.min.*}.gz"
 	    rm -f "$target" || true
 	    echo "==> compressing $file to $target"
