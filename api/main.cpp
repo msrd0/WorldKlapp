@@ -20,6 +20,7 @@ class driver
 {
 public:
 	int laps = 0;
+	int nr = 0;
 	double avg = 0;
 	QString name = "dummy";
 	
@@ -28,6 +29,7 @@ public:
 		QJsonObject obj;
 		obj.insert("laps", laps);
 		obj.insert("avg", avg);
+		obj.insert("nr", nr);
 		obj.insert("name", name);
 		return obj;
 	}
@@ -83,6 +85,7 @@ static QJsonArray parse_file(QFile *in)
 		uint rank = match.captured("teamrank").toUInt();
 		teams[rank].rank = rank;
 		teams[rank].laps++;
+		teams[rank].nr = match.captured("teamnr").toInt();
 		teams[rank].name = match.captured("teamname");
 		long time = QTime::fromString(match.captured("laptime") + "0", "hh:mm:ss:zzz").msecsSinceStartOfDay();
 		teams[rank].avg = (teams[rank].avg * (teams[rank].laps - 1) + time) / teams[rank].laps;
