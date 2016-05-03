@@ -29,7 +29,7 @@ if [ "${CC: -3}" == "gcc" ]; then
 		fi
 	done
 	for file in html/klapp/*.min.*; do
-	    target="${file%.min.*}.gz"
+	    target="${file%.min.*}.${file#*.min.}.gz"
 	    rm -f "$target" || true
 	    echo "==> compressing $file to $target"
 	    cat "$file" | gzip >"$target"
