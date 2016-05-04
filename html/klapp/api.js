@@ -40,22 +40,3 @@ function receiveTeams()
 }
 
 $(document).ready(receiveTeams);
-
-
-function searchTeams(term)
-{
-	term = term.toLowerCase();
-	for (var i = 0; i < teams; i++)
-	{
-		if (teamnames[i].toLowerCase().indexOf(term) > -1)
-			$('#team' + teamids[i]).css("display", "");
-		else
-			$('#team' + teamids[i]).css("display", "none");
-	}
-}
-
-$(document).ready(function() {
-	$("#search").on("input", function() {
-		searchTeams($("#search").val());
-	});
-});
