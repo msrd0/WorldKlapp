@@ -1,3 +1,7 @@
+var teamnames = {};
+var teamids = {};
+var teams = 0;
+
 function receiveTeams()
 {
 	$.getJSON("api/teams.json", function(data) {
@@ -5,6 +9,9 @@ function receiveTeams()
 		teamcontainer.html("");
 		for (var i = 0; i < data.length; i++)
 		{
+			teamnames[i] = data[i].name;
+			teamids[i] = data[i].nr;
+			teams++;
 			var html  = '<div class="team" id="team' + data[i].nr + '">';
 			html     +=   '<div class="first">';
 			html     +=     '<div><span class="rank"><i class="cubes icon"></i>' + data[i].rank + '</span></div>';
@@ -33,3 +40,24 @@ function receiveTeams()
 }
 
 $(document).ready(receiveTeams);
+
+
+function searchTeams(term)
+{
+	term = term.toLowerCase();
+	console.log('search "' + term + '" in ' + teams + ' teams');
+	for (var i = 0; i < teams; i++)
+	{
+		console.log(teamids[i] + "\t" + teamnames[i]);
+		if (teamnames[i].toLowerCase().indexOf(term) > -1)
+			$('#team' + teamids[i]).css("display", "");
+		else
+			$('#team' + teamids[i]).css("display", "none");
+	}
+}
+
+$(document).ready(function() {
+	$("#search").on("input", function() {
+		searchTeams($("#search").val());
+	});
+});
