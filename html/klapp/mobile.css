@@ -1,0 +1,8 @@
+@media (max-width: 900px) {
+	.team {
+		padding: 3px 0;
+	}
+	.team div {
+		padding: 1px;
+	}
+}

@@ -6,7 +6,7 @@
 	margin-bottom: 10px;
 	
 	display: -webkit-flex;
-	display: -mox-flex;
+	display: -moz-flex;
 	display: flex;
 }
 
@@ -17,11 +17,21 @@
 .team div div {
 	padding: 8px;
 }
-.team div.first {
-	flex-grow: 1;
+.team div.first div {
+	min-width: 80px;
 }
 .team div.second {
-	flex-grow: 3;
+	flex-grow: 1;
+}
+.team div.second .titleline {
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: flex;
+	width: 100%;
+}
+.team div.second .titleline li {
+	list-style: none;
+	flex-grow: 1;
 }
 
 .team .rank {
