@@ -24,7 +24,7 @@ function receiveTeams()
 			}
 			html     +=   '</div>';
 			html     +=   '<div class="third">';
-			html     +=     '<div><span class="speed">' + data[i].avg + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
+			html     +=     '<div><span class="speed">' + data[i].avg.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
 			html     +=   '</div>';
 			html     += '</div>';
 			teamcontainer.append(html);

@@ -87,8 +87,9 @@ static QJsonArray parse_file(QFile *in)
 		teams[rank].laps++;
 		teams[rank].nr = match.captured("teamnr").toInt();
 		teams[rank].name = match.captured("teamname");
-		long time = QTime::fromString(match.captured("laptime") + "0", "hh:mm:ss:zzz").msecsSinceStartOfDay();
-		teams[rank].avg = (teams[rank].avg * (teams[rank].laps - 1) + time) / teams[rank].laps;
+		long time = QTime::fromString(match.captured("laptime") + "0", "hh:mm:ss.zzz").msecsSinceStartOfDay();
+		Q_ASSERT(time != 0);
+		teams[rank].avg = (teams[rank].avg * (teams[rank].laps - 1) + (450.0 / time * 1000.0 * 3.6)) / teams[rank].laps;
 	}
 	printf("finished parsing %s\n", qPrintable(in->fileName()));
 	
