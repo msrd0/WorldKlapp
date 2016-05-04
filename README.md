@@ -5,19 +5,34 @@ LiveTicker für den [WorldKlapp](http://world-klapp.de).
 ## Usage
 
 This project is build with CMake. To compile, download the whole repository
-```
-git clone https://github.com/msrd0/WorldKlapp.git
+```bash
+git clone --depth=1 https://github.com/msrd0/WorldKlapp.git
 cd WorldKlapp
-git submodule init
-git submodule update
 ```
 Then, build the project with CMake:
-```
+```bash
 mkdir build
 cd build
 cmake -DCMAKE_RELEASE_TYPE=Release ..
 make
 ```
-Now, edit the [httpd/httpd.ini](https://github.com/msrd0/WorldKlapp/blob/master/httpd/httpd.ini) file
-to fit your needs. If your database is not filled, use ./klapp-competitors to fill it. Afterwards, you
-can simply start ./klapp-httpd
+
+To use the program, you need an nginx server. Add something like this to the configuration file `/etc/nginx/nginx.conf`:
+```nginx
+http {
+
+  gzip  on;
+  gzip_types text/plain text/css text/javascript application/javascript text/html;
+  
+  server {
+    
+    location /klapp/ {
+      root /YOUR/CLONE/LOCATION/html/;
+    }
+    location /klapp/api/ {
+      proxy_pass http://localhost:8000/;
+    }
+  }
+}
+```
+Afterwards, restart nginx and start `./api/klapp-api`. Please note that you will need to upload a file before you get a non-empty web page.
