@@ -21,6 +21,8 @@
 	min-width: 80px;
 }
 .team div.second {
+	-webkit-flex-grow: 1;
+	-moz-flex-grow: 1;
 	flex-grow: 1;
 }
 .team div.second .titleline {
@@ -31,6 +33,8 @@
 }
 .team div.second .titleline li {
 	list-style: none;
+	-webkit-flex-grow: 1;
+	-moz-flex-grow: 1;
 	flex-grow: 1;
 }
 
