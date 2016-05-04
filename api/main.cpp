@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QRegularExpression>
+#include <QTextCodec>
 #include <QTime>
 
 #include <microhttpd.h>
@@ -38,12 +39,15 @@ class team : public driver
 {
 public:
 	int rank = std::numeric_limits<int>::max();
+	int currdriver = -1;
 	driver drivers[DRIVERPERTEAM];
 	
 	virtual QJsonObject toJson()
 	{
 		QJsonObject obj = driver::toJson();
 		obj.insert("rank", rank);
+		obj.insert("currdriver", currdriver);
+		std::sort(drivers, drivers+4, [](const driver &d1, const driver &d2){ return d1.nr<d2.nr; });
 		QJsonArray d;
 		for (int i = 0; i < DRIVERPERTEAM; i++)
 			d.push_back(drivers[i].toJson());
@@ -71,11 +75,15 @@ static QJsonArray parse_file(QFile *in)
 		return QJsonArray();
 	}
 	
+	// the input is iso-8859-15
+	QTextCodec *codec = QTextCodec::codecForName("ISO-8859-15");
+	
 	team teams[MAXTEAMS];
 	QByteArray line;
 	for (uint ll = 1; !(line = in->readLine()).isEmpty(); ll++)
 	{
-		QRegularExpressionMatch match = regex.match(line);
+		QString lineu = codec->toUnicode(line.trimmed());
+		QRegularExpressionMatch match = regex.match(lineu);
 		if (!match.hasMatch())
 		{
 			fprintf(stderr, "%s:%u: line doesn't match\n", qPrintable(in->fileName()), ll);
@@ -88,8 +96,23 @@ static QJsonArray parse_file(QFile *in)
 		teams[rank].nr = match.captured("teamnr").toInt();
 		teams[rank].name = match.captured("teamname");
 		long time = QTime::fromString(match.captured("laptime") + "0", "hh:mm:ss.zzz").msecsSinceStartOfDay();
-		Q_ASSERT(time != 0);
-		teams[rank].avg = (teams[rank].avg * (teams[rank].laps - 1) + (450.0 / time * 1000.0 * 3.6)) / teams[rank].laps;
+		double speed = 450.0 / time * 1000.0 * 3.6;
+		teams[rank].avg = (teams[rank].avg * (teams[rank].laps - 1) + speed) / teams[rank].laps;
+		
+		uint drivernr = match.captured("drivernr").toUInt();
+		driver *drivers = teams[rank].drivers;
+		for (int i = 0; i < DRIVERPERTEAM; i++)
+		{
+			if (drivers[i].nr == drivernr || drivers[i].nr == 0)
+			{
+				drivers[i].nr = drivernr;
+				drivers[i].laps++;
+				drivers[i].name = match.captured("driverfirstname") + " " + match.captured("driverlastname");
+				drivers[i].avg = (drivers[i].avg * (drivers[i].laps - 1) + speed) / drivers[i].laps;
+				teams[rank].currdriver = drivernr;
+				break;
+			}
+		}
 	}
 	printf("finished parsing %s\n", qPrintable(in->fileName()));
 	

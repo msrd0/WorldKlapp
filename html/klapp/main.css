@@ -1,5 +1,5 @@
 .team {
-	background-color: #0af;
+	background-color: #8cf;
 	border: 2px solid #00f;
 	border-radius: 10px;
 	padding: 10px;
@@ -34,7 +34,7 @@
 }
 
 .team .laps {
-	background-color: #08f;
+	background-color: #5af;
 	color: #000;
 	border: 3px solid #00f;
 	padding: 1px 5px;
@@ -43,7 +43,7 @@
 }
 
 .team .speed {
-	background-color: #08f;
+	background-color: #5af;
 	color: #000;
 	border: 3px solid #00f;
 	padding: 3px 5px;
@@ -66,4 +66,12 @@
 }
 .team .num:after {
 	content: ")";
+}
+
+.driver {
+	color: #333;
+}
+.curr .driver {
+	font-weight: bold;
+	color: #008;
 }

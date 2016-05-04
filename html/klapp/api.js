@@ -5,7 +5,7 @@ function receiveTeams()
 		teamcontainer.html("");
 		for (var i = 0; i < data.length; i++)
 		{
-			var html  = '<div class="team">';
+			var html  = '<div class="team" id="team' + data[i].nr + '">';
 			html     +=   '<div class="first">';
 			html     +=     '<div><span class="rank"><i class="cubes icon"></i>' + data[i].rank + '</span></div>';
 			html     +=     '<div><span class="laps">' + data[i].laps + '</span></div>';
@@ -17,7 +17,7 @@ function receiveTeams()
 			html     +=     '</div>';
 			for (var j = 0; j < data[i].drivers.length; j++)
 			{
-				html +=     '<li>';
+				html +=     '<li id="team' + data[i].nr + 'driver' + data[i].drivers[j].nr + '" class="' + (data[i].drivers[j].nr == data[i].currdriver ? 'curr' : '') + '">';
 				html +=       '<span class="driver">' + data[i].drivers[j].name + '</span>';
 				html +=       '<span class="num drivernum">' + data[i].drivers[j].nr + '</span>';
 				html +=     '</li>';
