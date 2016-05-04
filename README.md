@@ -1,4 +1,4 @@
-# WorldKlapp [![Build Status](https://img.shields.io/travis/msrd0/WorldKlapp/master.svg)](https://travis-ci.org/msrd0/WorldKlapp) [![License](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/msrd0/WorldKlapp/blob/master/LICENSE)
+# WorldKlapp [![Build Status](https://img.shields.io/travis/msrd0/WorldKlapp/html-js-api.svg)](https://travis-ci.org/msrd0/WorldKlapp) [![License](https://img.shields.io/badge/license-GPL3-blue.svg)](https://github.com/msrd0/WorldKlapp/blob/master/LICENSE)
 
 LiveTicker für den [WorldKlapp](http://world-klapp.de).
 
