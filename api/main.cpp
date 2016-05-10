@@ -62,11 +62,11 @@ static QJsonArray parse_file(QFile *in)
 				"(?P<teamrank>\\d+)\t"
 				"(?P<teamnr>\\d+)\t"
 				"(?P<teamname>[^\t]+)\t"
-				"(?P<teamfirstname>[^\t]+)\t"
+				"(?P<teamfirstname>[^\t]*)\t"
 				"(?P<teamlaps>\\d+)\t"
 				"(?P<drivernr>\\d+)\t"
 				"(?P<driverlastname>[^\t]+)\t"
-				"(?P<driverfirstname>[^\t]+)\t"
+				"(?P<driverfirstname>[^\t]*)\t"
 				"(?P<laptime>[\\d:\\.]+)"
 			);
 	if (!regex.isValid())
