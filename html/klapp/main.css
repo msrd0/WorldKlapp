@@ -10,6 +10,12 @@
 	display: flex;
 }
 
+.team li {
+	margin: 3px;
+	list-style: none;
+	padding-left: 5px;
+}
+
 .team div {
 	padding: 5px;
 	display: block;
@@ -55,6 +61,12 @@
 	font-weight: bold;
 	font-size: 1.2em;
 }
+.team .driverlaps {
+	background-color: #5af;
+	padding: 1px;
+	border: 1px solid #00f;
+	margin-left: 10px;
+}
 
 .team .speed {
 	background-color: #5af;
@@ -63,6 +75,12 @@
 	padding: 3px 5px;
 	font-weight: bold;
 	font-size: 1.2em;
+}
+.team .speedcontainer .driverspeed {
+	background-color: #5af;
+	padding: 1px;
+	margin: 0;
+	border: 1px solid #00f;
 }
 
 .team .title {
@@ -85,7 +103,28 @@
 .driver {
 	color: #333;
 }
+.curr {
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: flex;
+	padding-right: 10px;
+}
+.curr.slow {
+	background-color: rgba(255, 170, 0, 0.7);
+}
+.curr.quick {
+	background-color: rgba(0, 255, 0, 0.5);
+}
 .curr .driver {
 	font-weight: bold;
 	color: #008;
+}
+.curr .spacer {
+	-webkit-flex-grow: 1;
+	-moz-flex-grow: 1;
+	flex-grow: 1;
+}
+.curr .speedcontainer {
+	margin: 0;
+	padding: 0;
 }

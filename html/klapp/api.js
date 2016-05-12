@@ -23,13 +23,22 @@ function receiveTeams()
 			html     +=         '<span class="title">' + data[i].name + '</span>';
 			html     +=         '<span class="num titlenum">' + data[i].nr + '</span>';
 			html     +=       '</li>';
-			html     +=       '<div><span class="speed">' + data[i].avg.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
+			html     +=       '<div><span class="speed">&Oslash;&nbsp;' + data[i].avg.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
 			html     +=     '</div>';
 			for (var j = 0; j < data[i].drivers.length; j++)
 			{
-				html +=     '<li id="team' + data[i].nr + 'driver' + data[i].drivers[j].nr + '" class="' + (data[i].drivers[j].nr == data[i].currdriver ? 'curr' : '') + '">';
+				if (data[i].drivers[j].name == "dummy")
+					continue;
+				html +=     '<li id="team' + data[i].nr + 'driver' + data[i].drivers[j].nr
+				            + '" class="' + (data[i].drivers[j].nr == data[i].currdriver ? 'curr' : '')
+				            + ' ' + (data[i].drivers[j].avg < data[i].avg ? "slow" : "quick") + '">';
 				html +=       '<span class="driver">' + data[i].drivers[j].name + '</span>';
-				html +=       '<span class="num drivernum">' + data[i].drivers[j].nr + '</span>';
+				html +=       '<span class="driverlaps">' + data[i].drivers[j].laps + '</span>';
+				if (data[i].drivers[j].nr == data[i].currdriver)
+				{
+					html +=   '<div class="spacer"></div>';
+					html +=   '<div class="speedcontainer"><span class="driverspeed">&Oslash;&nbsp;' + data[i].drivers[j].avg.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
+				}
 				html +=     '</li>';
 			}
 			html     +=   '</div>';
