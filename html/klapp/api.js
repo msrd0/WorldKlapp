@@ -37,7 +37,7 @@ function receiveTeams()
 				if (data[i].drivers[j].nr == data[i].currdriver)
 				{
 					html +=   '<div class="spacer"></div>';
-					html +=   '<div class="speedcontainer"><span class="driverspeed">&Oslash;&nbsp;' + data[i].drivers[j].avg.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
+					html +=   '<div class="speedcontainer"><span class="driverspeed">&Oslash;&nbsp;' + data[i].drivers[j].last.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
 				}
 				html +=     '</li>';
 			}
