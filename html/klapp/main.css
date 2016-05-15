@@ -1,3 +1,11 @@
+#statuscontainer {
+	background-color: #8cf;
+	border: 2px solid #f00;
+	border-radius: 10px;
+	padding: 5px 10px;
+	margin-bottom: 10px;
+}
+
 .team {
 	background-color: #8cf;
 	border: 2px solid #00f;

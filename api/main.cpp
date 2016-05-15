@@ -24,6 +24,7 @@ public:
 	int nr = 0;
 	double avg = 0;
 	double last = 0;
+	double best = -1;
 	QString name = "dummy";
 	
 	virtual QJsonObject toJson()
@@ -32,6 +33,7 @@ public:
 		obj.insert("laps", laps);
 		obj.insert("avg", avg);
 		obj.insert("last", last);
+		obj.insert("best", best);
 		obj.insert("nr", nr);
 		obj.insert("name", name);
 		return obj;
@@ -101,6 +103,7 @@ static QJsonArray parse_file(QFile *in)
 		double speed = 450.0 / time * 1000.0 * 3.6;
 		teams[rank].avg = (teams[rank].avg * (teams[rank].laps - 1) + speed) / teams[rank].laps;
 		teams[rank].last = speed;
+		teams[rank].best = std::max(teams[rank].best, speed);
 		
 		uint drivernr = match.captured("drivernr").toUInt();
 		driver *drivers = teams[rank].drivers;
@@ -113,6 +116,7 @@ static QJsonArray parse_file(QFile *in)
 				drivers[i].name = match.captured("driverfirstname") + " " + match.captured("driverlastname");
 				drivers[i].avg = (drivers[i].avg * (drivers[i].laps - 1) + speed) / drivers[i].laps;
 				drivers[i].last = speed;
+				drivers[i].best = std::max(drivers[i].best, speed);
 				teams[rank].currdriver = drivernr;
 				break;
 			}

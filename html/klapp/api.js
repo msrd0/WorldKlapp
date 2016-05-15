@@ -30,14 +30,18 @@ function receiveTeams()
 				if (data[i].drivers[j].name == "dummy")
 					continue;
 				html +=     '<li id="team' + data[i].nr + 'driver' + data[i].drivers[j].nr
-				            + '" class="' + (data[i].drivers[j].nr == data[i].currdriver ? 'curr' : '')
-				            + ' ' + (data[i].drivers[j].avg < data[i].avg ? "slow" : "quick") + '">';
+				            + '" class="curr' + ' '
+							+ ((data[i].drivers[j].nr == data[i].currdriver) ?  (data[i].drivers[j].last < data[i].avg ? "slow" : "quick") : "") + '">';
 				html +=       '<span class="driver">' + data[i].drivers[j].name + '</span>';
 				html +=       '<span class="driverlaps">' + data[i].drivers[j].laps + '</span>';
+				html +=   '<div class="spacer"></div>';
 				if (data[i].drivers[j].nr == data[i].currdriver)
 				{
-					html +=   '<div class="spacer"></div>';
-					html +=   '<div class="speedcontainer"><span class="driverspeed">&Oslash;&nbsp;' + data[i].drivers[j].last.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
+					html +=   '<div class="speedcontainer"><span class="driverspeed">' + data[i].drivers[j].last.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
+				}
+				else
+				{
+					html +=   '<div class="speedcontainer"><span class="driverspeed">&Oslash;&nbsp;' + data[i].drivers[j].avg.toFixed(2) + '&nbsp;<sup>km</sup>/<sub>h</sub></span></div>';
 				}
 				html +=     '</li>';
 			}
@@ -45,6 +49,39 @@ function receiveTeams()
 			html     += '</div>';
 			teamcontainer.append(html);
 		}
+		
+		var statuscontainer = $('#statuscontainer');
+		statuscontainer.html("");
+		var mname, mlaps = 0;
+		var qname, qavg = 0;
+		var aname, aavg = 0;
+		var alllaps = 0;
+		for (var i = 0; i < data.length; i++)
+		{
+			alllaps += data[i].laps;
+			for (var j = 0; j < data[i].drivers.length; j++)
+			{
+				if (data[i].drivers[j].laps > mlaps)
+				{
+					mlaps = data[i].drivers[j].laps;
+					mname = data[i].drivers[j].name;
+				}
+				if (data[i].drivers[j].best > qavg)
+				{
+					qavg = data[i].drivers[j].best;
+					qname = data[i].drivers[j].name;
+				}
+				if (data[i].drivers[j].avg > aavg)
+				{
+					aavg = data[i].drivers[j].avg;
+					aname = data[i].drivers[j].name;
+				}
+			}
+		}
+		statuscontainer.append("<div><b>Meiste Runden:</b> <i>" + mlaps + "</i> von <i>" + mname + "</i></div>");
+		statuscontainer.append("<div><b>Schnellste Runde:</b> <i>" + qavg + "</i> von <i>" + qname + "</i></div>");
+		statuscontainer.append("<div><b>Höchster Durchschnitt:</b> <i>" + aavg.toFixed(2) + "</i> von <i>" + aname + "</i></div>");
+		statuscontainer.append("<div><b>Insgesamt:</b> <i>" + alllaps + "</i> Runden (<i>" + (0.45 * alllaps).toFixed(2) + "</i> km)</div>");
 	});
 }
 
