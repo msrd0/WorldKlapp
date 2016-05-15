@@ -79,9 +79,9 @@ function receiveTeams()
 			}
 		}
 		statuscontainer.append("<div><b>Meiste Runden:</b> <i>" + mlaps + "</i> von <i>" + mname + "</i></div>");
-		statuscontainer.append("<div><b>Schnellste Runde:</b> <i>" + qavg + "</i> von <i>" + qname + "</i></div>");
-		statuscontainer.append("<div><b>Höchster Durchschnitt:</b> <i>" + aavg.toFixed(2) + "</i> von <i>" + aname + "</i></div>");
-		statuscontainer.append("<div><b>Insgesamt:</b> <i>" + alllaps + "</i> Runden (<i>" + (0.45 * alllaps).toFixed(2) + "</i> km)</div>");
+		statuscontainer.append("<div><b>Schnellste Runde:</b> <i>" + qavg.toFixed(2) + " <sup>km</sup>/<sub>h</sub></i> von <i>" + qname + "</i></div>");
+		statuscontainer.append("<div><b>Höchster Durchschnitt:</b> <i>" + aavg.toFixed(2) + " <sup>km</sup>/<sub>h</sub></i> von <i>" + aname + "</i></div>");
+		statuscontainer.append("<div><b>Insgesamt:</b> <i>" + alllaps + "</i> Runden (<i>" + (0.45 * alllaps).toFixed(2) + " km</i>)</div>");
 	});
 }
 
